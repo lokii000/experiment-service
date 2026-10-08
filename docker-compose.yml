@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: experiments
+      POSTGRES_USER: experiment
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U experiment -d experiments"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+  api:
+    build: .
+    ports:
+      - "${PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      REQUIRE_DATABASE: "true"
+      CONFIG_PATH: /app/config/experiments.json
+      DATABASE_URL: postgres://experiment:${POSTGRES_PASSWORD}@postgres:5432/experiments?sslmode=disable
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN in .env}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      ASSIGN_RATE_RPS: ${ASSIGN_RATE_RPS:-1500}
+      ASSIGN_RATE_BURST: ${ASSIGN_RATE_BURST:-3000}
+      TRACK_RATE_RPS: ${TRACK_RATE_RPS:-60}
+      TRACK_RATE_BURST: ${TRACK_RATE_BURST:-120}
+      ADMIN_RATE_RPS: ${ADMIN_RATE_RPS:-10}
+      ADMIN_RATE_BURST: ${ADMIN_RATE_BURST:-20}
+volumes:
+  pgdata:

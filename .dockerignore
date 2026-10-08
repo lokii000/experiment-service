@@ -1,0 +1,15 @@
+# Never send local secrets or VCS metadata to the image builder.
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.DS_Store
+bin/
+build/
+dist/
+*.test
+*.out
+coverage.html
+loadtest/
+docs/

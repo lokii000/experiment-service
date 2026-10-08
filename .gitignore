@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+*.log
+*.test
+bin/
+build/
+dist/
+*.out
+coverage.html
+coverage.out
+.DS_Store
+
+# Local editor, Railway CLI metadata, and patch artifacts
+.idea/
+.vscode/
+.railway/
+*.rej
+*.orig
+*.pem
+*.key
+*.p12
+__pycache__/

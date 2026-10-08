@@ -1,0 +1,33 @@
+{
+  "projects": [
+    {
+      "id": "demo-project-001",
+      "public_key": "pk_demo",
+      "experiments": [
+        {
+          "key": "checkout_button_v1",
+          "assignment_id": "cohort-checkout-button-001",
+          "revision": 1,
+          "status": "active",
+          "traffic_bps": 8000,
+          "variants": [
+            {"key": "control", "weight_bps": 5000},
+            {"key": "treatment", "weight_bps": 5000}
+          ]
+        },
+        {
+          "key": "homepage_layout_v1",
+          "assignment_id": "cohort-homepage-layout-001",
+          "revision": 1,
+          "status": "active",
+          "traffic_bps": 10000,
+          "variants": [
+            {"key": "control", "weight_bps": 5000},
+            {"key": "compact", "weight_bps": 3000},
+            {"key": "expanded", "weight_bps": 2000}
+          ]
+        }
+      ]
+    }
+  ]
+}
