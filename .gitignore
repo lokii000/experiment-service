@@ -22,5 +22,5 @@ coverage.out
 *.p12
 __pycache__/
 
-# Generated local delivery archives
+# Development delivery archives (not part of source)
 experiment-service-*.zip

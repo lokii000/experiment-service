@@ -186,7 +186,7 @@ The supplied Go load generator sent requests to the locally running Docker API, 
 - The full Go suite, race detector, and `go vet` passed locally. The six Node browser tests and rate-limiter tests passed after the later hardening update. The current Docker build on Go 1.27.1 / Alpine 3.24 starts in PostgreSQL mode, and both `/healthz` and `/readyz` return HTTP 200.
 - In the manual DB-outage test, assignment continued returning HTTP 200, tracking returned **503** for a valid event, and retry after PostgreSQL recovery returned **201**, followed by **200 duplicate** for the same event. Concurrent same-visitor exposure submissions produced **1 new insert and 19 duplicates**, with no request failures.
 
-**Coverage limits:** integration tests can print `SKIP` when `TEST_DATABASE_URL` is unset; a green test command in that mode is not evidence of actual DB validation. Multi-replica cache failover, hosted edge limits, long-running soak testing, full penetration testing, and public HTTPS smoke tests remain unverified.
+**Coverage limits:** integration tests can print `SKIP` when `TEST_DATABASE_URL` is unset; a green test command in that mode is not evidence of actual DB validation. Multi-replica cache failover, hosted edge limits, long-running soak testing, and full penetration testing remain unverified. Public HTTPS smoke tests **passed on 2026-10-08** (health/readiness, authentication rejection, assignment, event deduplication, conversion, and authenticated results).
 
 ## 11. Scale evolution, triggered by evidence
 
@@ -195,6 +195,12 @@ At **100 million assignment requests/day**, average traffic is about **1,157 RPS
 Event writes, index growth, and analytics scans are the more likely bottleneck at large scale. When WAL/IOPS, queue latency, or analytics-read contention justify it, evolve toward durable ingestion acknowledgments, a streaming backbone (e.g., Kafka), idempotent consumers, partitioned raw-event retention, precomputed aggregates, and a separate reporting store. Do **not** insert a broker merely to increase the number of components in a take-home.
 
 If tenant count grows, replace the singleton whole-document publication mechanism with tenant/experiment-scoped transactions, tenant-scoped authorization, and audit trails. If business requirements demand weight reallocation without rebucketing, introduce an explicit visitor-assignment persistence or signed client-carried assignment protocol and a migration model. These changes alter the product's consistency contract and should be introduced intentionally.
+
+### Future experiments: adaptive allocation and cross-site learning
+
+The MVP intentionally uses fixed variant weights per immutable cohort. A future **multi-armed bandit** strategy (for example, Thompson sampling or UCB) could allocate new traffic toward promising variants. That requires versioned allocation policies, logged assignment probabilities, appropriate adaptive-inference methods, guardrails against premature convergence, and an explicit way to preserve sticky assignments for returning visitors. We would introduce it only if optimization during an experiment became a product requirement; it should not be presented as equivalent to a fixed-split randomized controlled trial.
+
+For **cross-site learning**, a hierarchical statistical model could share useful priors among comparable experiments while retaining tenant-level effects. We would first define comparable metrics and populations, then address consent, tenant isolation, privacy, and transfer bias. Combining unrelated site outcomes naively would be misleading. Neither adaptive assignment nor cross-site pooling is implemented in this take-home.
 
 ## 12. Decision record and release gate
 
@@ -212,4 +218,4 @@ Related rationale: [ADR-001](ADR-001-core-invariants.md), [ADR-002](ADR-002-cont
 
 **Release evidence (2026-10-08):** Railway built and launched the PostgreSQL-enabled Go API. The public domain returned HTTP 200 for `/healthz` and `/readyz`, HTTP 401 for unauthenticated admin results, and HTTP 200 with two experiment assignments. An enrolled synthetic visitor generated exposure 201, repeat exposure 200 duplicate, and conversion 201. The authenticated results API confirmed one treatment exposure and conversion, and control 0/0 with a null rate. This proves a functioning public demonstration, **not** statistical effectiveness or comprehensive operational security. No hosted outage, multi-replica, failover, or load test has been claimed.
 
-**Outstanding production-hardening review:** confirm managed PostgreSQL TLS enforcement, proxy/edge limits, secret rotation, privacy/retention, structured observability, and emergency pause behavior. Verify `.env` and any local Railway credentials are excluded before the first Git commit. The repository publication process does not change these measured results.
+**Outstanding production-hardening review:** confirm managed PostgreSQL TLS enforcement, proxy/edge limits, secret rotation, privacy/retention, structured observability, and emergency pause behavior. Verify `.env` and any local Railway credentials remain excluded from every release. The GitHub repository is published; future releases should retain secrets scanning and operational review. The repository publication process does not change these measured results.

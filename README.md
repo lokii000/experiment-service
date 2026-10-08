@@ -41,7 +41,7 @@ Go API periodically refreshes its cached configuration from PostgreSQL.
 - **Page-render safety:** browser assignment defaults to a 100 ms deadline and renders control on failure; background tracking retries transient errors with an unchanged event ID.
 - **Operational scope:** one Go deployment, PostgreSQL, no Redis/Kafka; in-process limits are per peer and per instance.
 
-Full reasoning: [System design](docs/DESIGN.md) · [Core invariants](docs/ADR-001-core-invariants.md) · [Persistence ADR](docs/ADR-002-control-plane-and-events.md) · [Security review](docs/SECURITY_REVIEW.md).
+Full reasoning: [System design](docs/DESIGN.md) · [HLD, LLD and validation](docs/ARCHITECTURE_AND_VALIDATION.md) · [Core invariants](docs/ADR-001-core-invariants.md) · [Persistence ADR](docs/ADR-002-control-plane-and-events.md) · [Security review](docs/SECURITY_REVIEW.md).
 
 ## 1. Run locally (recommended: Docker Compose)
 
@@ -292,4 +292,4 @@ docker-compose.yml
 .env.example
 ```
 
-**Submission gate:** finalize hosting and run public HTTPS/API smoke tests; then create the final Git commit(s) and push the repository. No public URL is claimed before it is verified.
+**Submission status:** the Railway public HTTPS smoke test passed on 2026-10-08, and the source is published on GitHub. This is a verified take-home demonstration, not a production readiness or security certification.
