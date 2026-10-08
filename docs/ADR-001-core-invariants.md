@@ -1,6 +1,6 @@
 # ADR-001: Immutable experiment cohorts and stateless assignment
 
-**Status:** Accepted; assignment invariants implemented, PostgreSQL publishing described in ADR-002  
+**Status:** Accepted; assignment invariants implemented, PostgreSQL publishing described in ADR-002
 **Context:** Assignment is on the customer page-rendering critical path, but configuration and analytics evolve independently.
 
 ## Decision
